@@ -138,12 +138,12 @@ public chose_wire(id, menu, key)
 	if(g_iWire == key)
 	{
 		client_print_color(id, id, "%sWybrales poprawny kabel (^4%s^1).", g_szPrefix, g_szWire[key]);
-		set_pdata_float(g_iC4, 99, get_gametime());
+		set_ent_data_float(g_iC4, "CGrenade", "m_flDefuseCountDown", get_gametime());
 	}
 	else
 	{
 		client_print_color(id, id, "%sWybrales ^4%s^1. Poprawnym kablem byl ^4%s^1.", g_szPrefix, g_szWire[key], g_szWire[g_iWire]);
-		set_pdata_float(g_iC4, 100, 0.0);
+		set_ent_data_float(g_iC4, "CGrenade", "m_flC4Blow", get_gametime());
 	}
 
 	message_begin(MSG_ONE, g_iBarTime, _, id)

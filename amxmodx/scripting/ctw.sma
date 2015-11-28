@@ -1,25 +1,25 @@
 /*
  * AMX Mod X plugin
  *
- * Cut the wire, v0.0.3
+ * Cut the wire, v0.0.4-dev
  *
- * (c) Copyright 2014 - Ni3znajomy
+ * (c) Copyright 2014-2015 - Ni3znajomy
  * This file is provided as is (no warranties).
  *
  */
 
 /*
  * Description:
- * As CT allows to cut a wire had been chosen by planter (TT). If CT chose right the C4 won't explode in other case C4 will explode.
+ * As CT allows to cut a wire that has been chosen by planter (TT). If CT chose right the C4 won't explode in other case C4 will explode.
  *
  * Requirement(s):
  * AMX Mod X 1.8.3
  *
  * Setup:
- * Put .sma file into the amx/scripting folder
+ * Put .sma file into the amxmodx/scripting folder
  * Compile .sma file.
- * Put .amx file into amx/plugins folder
- * Write cutthewire.amx into plugins.ini
+ * Put .amxx file into amxmodx/plugins folder
+ * Type ctw.amxx into plugins.ini
  *
  * Credit(s):
  * Steven
@@ -50,9 +50,9 @@ new g_szPrefix[] = { "^1[^3CTW^1] " };
 
 public plugin_init()
 {
-	register_plugin("Cut the wire", "0.0.3", "Ni3znajomy")
+	register_plugin("Cut the wire", "0.0.4-dev", "Ni3znajomy")
 	
-	create_cvar("ctw_version", "0.0.3", FCVAR_SERVER, "CTW version");
+	create_cvar("ctw_version", "0.0.4-dev", FCVAR_SERVER, "CTW version");
 	
 	g_iBarTime = get_user_msgid("BarTime");
 	register_logevent("New_Round", 2, "1=Round_Start");

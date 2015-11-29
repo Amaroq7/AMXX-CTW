@@ -126,7 +126,10 @@ public bomb_defused(defuser)
 
 public chose_wire(id, menu, key)
 {
-	if(!is_user_alive(id) || key < 0 || key > 3 || key == MENU_TIMEOUT)
+	if(key == MENU_TIMEOUT || key < 0)
+		return PLUGIN_HANDLED;
+
+	if(!is_user_alive(id))
 		return PLUGIN_HANDLED;
 		
 	if(cs_get_user_team(id) == CS_TEAM_T)

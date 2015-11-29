@@ -38,13 +38,16 @@
 #include <hamsandwich>
 #include <fakemeta>
 
+#define MAX_WIRES 10
+
 new g_hMenu;
 
 new g_iC4;
 new g_iWire;
 new g_iBarTime;
 
-new g_szWire[4][] = { "Czerwony", "Zielony", "Zolty", "Niebieski" };
+new Array:g_arrayWires;
+new g_iWires;
 
 new g_szPrefix[] = { "^1[^3CTW^1] " };
 
@@ -59,12 +62,57 @@ public plugin_init()
 	RegisterHamPlayer(Ham_Killed, "PlayerKilledPost", 1);
 	
 	register_event("BarTime", "BarTime_event", "be", "1=0");
+
+	g_arrayWires = ArrayCreate(32, MAX_WIRES);
+
+	if(g_arrayWires == Invalid_Array)
+	{
+		set_fail_state("Cannot create CellArray!");
+		return;
+	}
+
+	AutoExecConfig(true, "ctw", "ctw");
 }
 
-public plugin_cfg()
+public OnConfigsExecuted()
 {
+	ReadWiresFromFile();
 	MakeMenu();
 }
+
+public ReadWiresFromFile()
+{
+	new szFileDir[PLATFORM_MAX_PATH], szLine[32];
+	get_localinfo("amxx_configsdir", szFileDir, charsmax(szFileDir));
+	format(szFileDir, charsmax(szFileDir), "%s/plugins/ctw/wires.ini", szFileDir);
+
+	new hFile = fopen(szFileDir, "rt", false);
+
+	if(!hFile)
+	{
+		set_fail_state("Cannot read %s file!", szFileDir);
+		return;
+	}
+
+	while(!feof(hFile))
+	{
+		fgets(hFile, szLine, charsmax(szLine));
+
+		if(!szLine[0] || szLine[0] == ';' || (szLine[0] == '/' && szLine[1] == '/'))
+			continue;
+
+		if(g_iWires >= MAX_WIRES)
+		{
+			log_amx("Cannot add more wires! Increase MAX_WIRES define in plugin!");
+			break;
+		}
+
+		ArrayPushString(g_arrayWires, szLine);
+		g_iWires++;
+	}
+	fclose(hFile);
+}
+		
 
 public BarTime_event(id)
 {
@@ -87,11 +135,13 @@ public PlayerKilledPost(victim, killer, gib)
 
 MakeMenu()
 {
-	g_hMenu = menu_create("Wybierz kabel", "chose_wire");
-	menu_additem(g_hMenu, "Czerwony");
-	menu_additem(g_hMenu, "Zielony");
-	menu_additem(g_hMenu, "Zolty");
-	menu_additem(g_hMenu, "Niebieski");
+	new szItem[32];
+	g_hMenu = menu_create("Choose a wire", "chose_wire");
+	for(new i=0; i<g_iWires; i++)
+	{
+		ArrayGetString(g_arrayWires, i, szItem, charsmax(szitem));
+		menu_additem(g_hMenu, szItem);
+	}
 }
 
 public bomb_planting(planter)
@@ -111,7 +161,7 @@ public bomb_planted(planter)
 public CheckWire()
 {
 	if(g_iWire == -1)
-		g_iWire = random(4);
+		g_iWire = random(g_iWires);
 }
 
 public bomb_defusing(defuser)
@@ -135,17 +185,17 @@ public chose_wire(id, menu, key)
 	if(cs_get_user_team(id) == CS_TEAM_T)
 	{
 		g_iWire = key;
-		client_print_color(id, id, "%sWybrales ^4%s^1.", g_szPrefix, g_szWire[key]);
+		client_print_color(id, id, "%sWybrales ^4%a^1.", g_szPrefix, ArrayGetStringHandle(g_arrayWires, key));
 		return PLUGIN_HANDLED;
 	}
 	if(g_iWire == key)
 	{
-		client_print_color(id, id, "%sWybrales poprawny kabel (^4%s^1).", g_szPrefix, g_szWire[key]);
+		client_print_color(id, id, "%sWybrales poprawny kabel (^4%a^1).", g_szPrefix, ArrayGetStringHandle(g_arrayWires, key));
 		set_ent_data_float(g_iC4, "CGrenade", "m_flDefuseCountDown", get_gametime());
 	}
 	else
 	{
-		client_print_color(id, id, "%sWybrales ^4%s^1. Poprawnym kablem byl ^4%s^1.", g_szPrefix, g_szWire[key], g_szWire[g_iWire]);
+		client_print_color(id, id, "%sWybrales ^4%a^1. Poprawnym kablem byl ^4%a^1.", g_szPrefix, ArrayGetStringHandle(g_arrayWires, key), ArrayGetStringHandle(g_arrayWires, g_iWire));
 		set_ent_data_float(g_iC4, "CGrenade", "m_flC4Blow", get_gametime());
 	}
 
@@ -171,4 +221,7 @@ HideMenu(id)
 }
 
 public plugin_end()
+{
 	menu_destroy(g_hMenu);
+	ArrayDestroy(g_arrayWires);
+}

@@ -53,7 +53,7 @@ new g_szPrefix[] = { "^1[^3CTW^1] " };
 
 public plugin_init()
 {
-	register_plugin("Cut the wire", "0.0.4-dev", "Ni3znajomy")
+	register_plugin("Cut the wire", "0.0.4-dev", "Ni3znajomy");
 	
 	create_cvar("ctw_version", "0.0.4-dev", FCVAR_SERVER, "CTW version");
 	
@@ -71,6 +71,7 @@ public plugin_init()
 		return;
 	}
 
+	register_dictionary("ctw.txt");
 	AutoExecConfig(true, "ctw", "ctw");
 }
 
@@ -90,7 +91,7 @@ public ReadWiresFromFile()
 
 	if(!hFile)
 	{
-		set_fail_state("Cannot read %s file!", szFileDir);
+		set_fail_state("%l", "CANNOT_READ_FILE", szFileDir);
 		return;
 	}
 
@@ -103,7 +104,7 @@ public ReadWiresFromFile()
 
 		if(g_iWires >= MAX_WIRES)
 		{
-			log_amx("Cannot add more wires! Increase MAX_WIRES define in plugin!");
+			log_amx("%l", "MORE_WIRES");
 			break;
 		}
 
@@ -147,6 +148,7 @@ MakeMenu()
 public bomb_planting(planter)
 {
 	g_iWire = -1;
+	SetupTitle(planter);
 	menu_display(planter, g_hMenu, 0, 3);
 }
 
@@ -166,6 +168,7 @@ public CheckWire()
 
 public bomb_defusing(defuser)
 {
+	SetupTitle(defuser);
 	menu_display(defuser, g_hMenu, 0, (cs_get_user_defuse(defuser)) ? 5 : 10);
 }
 
@@ -185,21 +188,21 @@ public chose_wire(id, menu, key)
 	if(cs_get_user_team(id) == CS_TEAM_T)
 	{
 		g_iWire = key;
-		client_print_color(id, id, "%sWybrales ^4%a^1.", g_szPrefix, ArrayGetStringHandle(g_arrayWires, key));
+		client_print_color(id, id, "%l", "CHOSE_WIRE", g_szPrefix, ArrayGetStringHandle(g_arrayWires, key));
 		return PLUGIN_HANDLED;
 	}
 	if(g_iWire == key)
 	{
-		client_print_color(id, id, "%sWybrales poprawny kabel (^4%a^1).", g_szPrefix, ArrayGetStringHandle(g_arrayWires, key));
+		client_print_color(id, id, "%l", "CORRECT_WIRE", g_szPrefix, ArrayGetStringHandle(g_arrayWires, key));
 		set_ent_data_float(g_iC4, "CGrenade", "m_flDefuseCountDown", get_gametime());
 	}
 	else
 	{
-		client_print_color(id, id, "%sWybrales ^4%a^1. Poprawnym kablem byl ^4%a^1.", g_szPrefix, ArrayGetStringHandle(g_arrayWires, key), ArrayGetStringHandle(g_arrayWires, g_iWire));
+		client_print_color(id, id, "%l", "WRONG_WIRE", g_szPrefix, ArrayGetStringHandle(g_arrayWires, key), ArrayGetStringHandle(g_arrayWires, g_iWire));
 		set_ent_data_float(g_iC4, "CGrenade", "m_flC4Blow", get_gametime());
 	}
 
-	message_begin(MSG_ONE, g_iBarTime, _, id)
+	message_begin(MSG_ONE, g_iBarTime, _, id);
 	write_short(0);
 	message_end();
 
@@ -224,4 +227,11 @@ public plugin_end()
 {
 	menu_destroy(g_hMenu);
 	ArrayDestroy(g_arrayWires);
+}
+
+SetupTitle(id)
+{
+	static szTitle[32];
+	LookupLangKey(szTitle, charsmax(szTitle), "CHOOSE_WIRE", id);
+	menu_setprop(g_hMenu, MPROP_TITLE, szTitle);
 }

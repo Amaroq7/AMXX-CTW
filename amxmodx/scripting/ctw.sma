@@ -140,7 +140,7 @@ MakeMenu()
 	g_hMenu = menu_create("Choose a wire", "chose_wire");
 	for(new i=0; i<g_iWires; i++)
 	{
-		ArrayGetString(g_arrayWires, i, szItem, charsmax(szitem));
+		ArrayGetString(g_arrayWires, i, szItem, charsmax(szItem));
 		menu_additem(g_hMenu, szItem);
 	}
 }

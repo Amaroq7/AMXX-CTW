@@ -99,6 +99,8 @@ public ReadWiresFromFile()
 	{
 		fgets(hFile, szLine, charsmax(szLine));
 
+		trim(szLine);
+
 		if(!szLine[0] || szLine[0] == ';' || (szLine[0] == '/' && szLine[1] == '/'))
 			continue;
 

@@ -65,13 +65,12 @@ public plugin_init()
 
 	g_arrayWires = ArrayCreate(32, MAX_WIRES);
 
+	register_dictionary("ctw.txt");
 	if(g_arrayWires == Invalid_Array)
 	{
-		set_fail_state("Cannot create CellArray!");
+		set_fail_state("%l", "INVALID_HANDLE_CA");
 		return;
 	}
-
-	register_dictionary("ctw.txt");
 	AutoExecConfig(true, "ctw", "ctw");
 }
 

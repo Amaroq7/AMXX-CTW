@@ -1,5 +1,5 @@
 [en]
-INVALID_HANLDLE_CA = Cannot create CellArray!
+INVALID_HANDLE_CA = Cannot create CellArray!
 CANNOT_READ_FILE = Cannot read %s file!
 MORE_WIRES = Cannot add more wires! Increase value MAX_WIRES define in plugin!
 CHOOSE_WIRE = Choose the wire
@@ -8,7 +8,7 @@ CORRECT_WIRE = %sYou've chosen correct wire (^4%a^1).
 WRONG_WIRE = %sYou've chosen wrong wire ^4%a^1. The correct wire was ^4%a^1.
 
 [pl]
-INVALID_HANLDLE_CA = Nie mozna stworzyc CellArray!
+INVALID_HANDLE_CA = Nie mozna stworzyc CellArray!
 CANNOT_READ_FILE = Nie mozna odczytac pliku %s!
 MORE_WIRES = Nie mozna dodac wiecej kabli! Zwieksz wartosc definicji MAX_WIRES w pluginie!
 CHOOSE_WIRE = Wybierz kabel

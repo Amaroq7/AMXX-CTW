@@ -38,8 +38,6 @@
 #include <hamsandwich>
 #include <fakemeta>
 
-#define MAX_WIRES 10
-
 new g_hMenu;
 
 new g_iC4;
@@ -63,7 +61,7 @@ public plugin_init()
 	
 	register_event("BarTime", "BarTime_event", "be", "1=0");
 
-	g_arrayWires = ArrayCreate(32, MAX_WIRES);
+	g_arrayWires = ArrayCreate(32);
 
 	register_dictionary("ctw.txt");
 	if(g_arrayWires == Invalid_Array)
@@ -102,12 +100,6 @@ public ReadWiresFromFile()
 
 		if(!szLine[0] || szLine[0] == ';' || (szLine[0] == '/' && szLine[1] == '/'))
 			continue;
-
-		if(g_iWires >= MAX_WIRES)
-		{
-			log_amx("%l", "MORE_WIRES");
-			break;
-		}
 
 		ArrayPushString(g_arrayWires, szLine);
 		g_iWires++;

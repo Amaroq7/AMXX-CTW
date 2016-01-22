@@ -47,7 +47,7 @@ new g_iBarTime;
 new Array:g_arrayWires;
 new g_iWires;
 
-new g_szPrefix[] = { "^1[^3CTW^1] " };
+new g_szPrefix[] = { "[^3CTW^1] " };
 
 public plugin_init()
 {

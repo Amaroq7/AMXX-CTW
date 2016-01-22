@@ -3,7 +3,7 @@
  *
  * Cut the wire, v0.0.4-dev
  *
- * (c) Copyright 2014-2015 - Ni3znajomy
+ * (c) Copyright 2014-2016 - Ni3znajomy
  * This file is provided as is (no warranties).
  *
  */

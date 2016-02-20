@@ -40,7 +40,7 @@
 
 new g_hMenu;
 
-new g_iC4;
+new g_eC4;
 new g_iWire;
 new g_iBarTime;
 
@@ -115,13 +115,13 @@ public BarTime_event(id)
 
 public New_Round()
 {
-	g_iC4 = 0;
+	g_eC4 = 0;
 	g_iWire = -1;
 }
 
 public PlayerKilledPost(victim, killer, gib)
 {
-	if(!g_iC4)
+	if(!g_eC4)
 		return;
 	
 	HideMenu(victim);
@@ -149,7 +149,7 @@ public bomb_planted(planter)
 {
 	HideMenu(planter);
 
-	g_iC4 = find_ent_by_model(-1, "grenade", "models/w_c4.mdl");
+	g_eC4 = find_ent_by_model(-1, "grenade", "models/w_c4.mdl");
 	set_task(0.5, "CheckWire");
 }
 
@@ -184,15 +184,19 @@ public chose_wire(id, menu, key)
 		client_print_color(id, id, "%l", "CHOSE_WIRE", g_szPrefix, ArrayGetStringHandle(g_arrayWires, key));
 		return PLUGIN_HANDLED;
 	}
+
+	if(!is_valid_ent(g_eC4))
+		return PLUGIN_HANDLED;
+
 	if(g_iWire == key)
 	{
 		client_print_color(id, id, "%l", "CORRECT_WIRE", g_szPrefix, ArrayGetStringHandle(g_arrayWires, key));
-		set_ent_data_float(g_iC4, "CGrenade", "m_flDefuseCountDown", get_gametime());
+		set_ent_data_float(g_eC4, "CGrenade", "m_flDefuseCountDown", get_gametime());
 	}
 	else
 	{
 		client_print_color(id, id, "%l", "WRONG_WIRE", g_szPrefix, ArrayGetStringHandle(g_arrayWires, key), ArrayGetStringHandle(g_arrayWires, g_iWire));
-		set_ent_data_float(g_iC4, "CGrenade", "m_flC4Blow", get_gametime());
+		set_ent_data_float(g_eC4, "CGrenade", "m_flC4Blow", get_gametime());
 	}
 
 	message_begin(MSG_ONE, g_iBarTime, _, id);

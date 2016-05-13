@@ -47,7 +47,7 @@ new g_iBarTime;
 new Array:g_arrayWires;
 new g_iWires;
 
-new g_szPrefix[] = { "[^3CTW^1] " };
+new const g_szPrefix[] = { "[^3CTW^1]" };
 
 public plugin_init()
 {
@@ -181,7 +181,7 @@ public chose_wire(id, menu, key)
 	if(cs_get_user_team(id) == CS_TEAM_T)
 	{
 		g_iWire = key;
-		client_print_color(id, id, "%l", "CHOSE_WIRE", g_szPrefix, ArrayGetStringHandle(g_arrayWires, key));
+		client_print_color(id, id, "%s %l", g_szPrefix, "CHOSE_WIRE", ArrayGetStringHandle(g_arrayWires, key));
 		return PLUGIN_HANDLED;
 	}
 
@@ -190,12 +190,12 @@ public chose_wire(id, menu, key)
 
 	if(g_iWire == key)
 	{
-		client_print_color(id, id, "%l", "CORRECT_WIRE", g_szPrefix, ArrayGetStringHandle(g_arrayWires, key));
+		client_print_color(id, id, "%s %l", g_szPrefix, "CORRECT_WIRE", ArrayGetStringHandle(g_arrayWires, key));
 		set_ent_data_float(g_eC4, "CGrenade", "m_flDefuseCountDown", get_gametime());
 	}
 	else
 	{
-		client_print_color(id, id, "%l", "WRONG_WIRE", g_szPrefix, ArrayGetStringHandle(g_arrayWires, key), ArrayGetStringHandle(g_arrayWires, g_iWire));
+		client_print_color(id, id, "%s %l", g_szPrefix, "WRONG_WIRE", ArrayGetStringHandle(g_arrayWires, key), ArrayGetStringHandle(g_arrayWires, g_iWire));
 		set_ent_data_float(g_eC4, "CGrenade", "m_flC4Blow", get_gametime());
 	}
 

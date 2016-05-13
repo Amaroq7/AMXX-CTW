@@ -2,14 +2,14 @@
 INVALID_HANDLE_CA = Cannot create CellArray!
 CANNOT_READ_FILE = Cannot read %s file!
 CHOOSE_WIRE = Choose the wire
-CHOSE_WIRE = %sYou've chosen ^4%a^1.
-CORRECT_WIRE = %sYou've chosen correct wire (^4%a^1).
-WRONG_WIRE = %sYou've chosen wrong wire ^4%a^1. The correct wire was ^4%a^1.
+CHOSE_WIRE = You've chosen ^4%a^1.
+CORRECT_WIRE = You've chosen correct wire (^4%a^1).
+WRONG_WIRE = You've chosen wrong wire ^4%a^1. The correct wire was ^4%a^1.
 
 [pl]
 INVALID_HANDLE_CA = Nie mozna stworzyc CellArray!
 CANNOT_READ_FILE = Nie mozna odczytac pliku %s!
 CHOOSE_WIRE = Wybierz kabel
-CHOSE_WIRE = %sWybrales ^4%a^1.
-CORRECT_WIRE = %sWybrales poprawny kabel (^4%a^1).
-WRONG_WIRE = %sWybrales zly kabel ^4%a^1. Poprawnym kablem byl ^4%a^1.
+CHOSE_WIRE = Wybrales ^4%a^1.
+CORRECT_WIRE = Wybrales poprawny kabel (^4%a^1).
+WRONG_WIRE = Wybrales zly kabel ^4%a^1. Poprawnym kablem byl ^4%a^1.

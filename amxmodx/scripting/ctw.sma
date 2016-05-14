@@ -79,11 +79,6 @@ public plugin_init()
 
 	register_dictionary("ctw.txt");
 
-	if(g_arrayWires == Invalid_Array)
-	{
-		set_fail_state("%l", "INVALID_HANDLE_CA");
-		return;
-	}
 	AutoExecConfig(true, "ctw", "ctw");
 }
 

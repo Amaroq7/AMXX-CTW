@@ -23,6 +23,7 @@
  *
  * Credit(s):
  * Steven
+ * VEN - CS Bomb Script Tutorial
  *
  * Changelog:
  * 0.0.3 - fixed some bugs
@@ -38,16 +39,26 @@
 #include <hamsandwich>
 #include <fakemeta>
 
+#define INVALID_WIRE			-1
+
+#define BARTIME_NONE 			0
+#define BARTIME_PLANTING		3
+#define BARTIME_DEFUSE_WITH_KIT		5
+#define BARTIME_DEFUSE_WITHOUT_KIT	10
+
 new g_hMenu;
 
 new g_eC4;
 new g_iWire;
-new g_iBarTime;
+new g_iBarTimeMsg;
 
 new Array:g_arrayWires;
 new g_iWires;
 
 new const g_szPrefix[] = { "[^3CTW^1]" };
+
+//Player index for who reset menu
+new g_ePlayerResetMenu;
 
 public plugin_init()
 {
@@ -55,15 +66,19 @@ public plugin_init()
 	
 	create_cvar("ctw_version", "0.0.4-dev", FCVAR_SERVER, "CTW version");
 	
-	g_iBarTime = get_user_msgid("BarTime");
-	register_logevent("New_Round", 2, "1=Round_Start");
-	RegisterHamPlayer(Ham_Killed, "PlayerKilledPost", 1);
-	
-	register_event("BarTime", "BarTime_event", "be", "1=0");
+	g_iBarTimeMsg = get_user_msgid("BarTime");
+
+	register_event("BarTime", "OnBarTimeEvent", "bef", "1=0", "1=3", "1=5", "1=10");
+	register_logevent("OnNewRoundStart", 2, "1=Round_Start");
+	register_logevent("OnBombPlanted", 3, "2=Planted_The_Bomb");
+	register_logevent("OnBombDefused", 3, "2=Defused_The_Bomb");
+
+	RegisterHamPlayer(Ham_Killed, "CBasePlayerKilledPost", 1);
 
 	g_arrayWires = ArrayCreate(32);
 
 	register_dictionary("ctw.txt");
+
 	if(g_arrayWires == Invalid_Array)
 	{
 		set_fail_state("%l", "INVALID_HANDLE_CA");
@@ -72,17 +87,119 @@ public plugin_init()
 	AutoExecConfig(true, "ctw", "ctw");
 }
 
-public OnConfigsExecuted()
+public plugin_cfg()
 {
 	ReadWiresFromFile();
 	MakeMenu();
 }
 
-public ReadWiresFromFile()
+public client_disconnected(id, bool:drop, message[], maxlen)
+{
+	if(g_ePlayerResetMenu == id)
+		g_ePlayerResetMenu = 0;
+}
+
+public OnBarTimeEvent(id)
+{
+	new iTime = read_data(1);
+
+	switch(iTime)
+	{
+		case BARTIME_NONE:
+		{
+			HideMenu(id);
+			return;
+		}
+		case BARTIME_PLANTING:
+		{
+			g_iWire = -1;
+			g_ePlayerResetMenu = id;
+		}
+		case BARTIME_DEFUSE_WITH_KIT, BARTIME_DEFUSE_WITHOUT_KIT:
+		{
+			g_ePlayerResetMenu = id;
+		}
+	}
+	SetupTitle(id);
+	menu_display(id, g_hMenu, 0, iTime);
+}
+
+public OnNewRoundStart()
+{
+	g_ePlayerResetMenu = g_eC4 = 0;
+	g_iWire = INVALID_WIRE;
+}
+
+public CBasePlayerKilledPost(this, killer, gib)
+{
+	if(g_ePlayerResetMenu == this)
+	{
+		HideMenu(this);
+	}
+}
+
+public MenuWiresHandler(id, menu, key)
+{
+	if(key == MENU_TIMEOUT || key == MENU_EXIT)
+		return PLUGIN_HANDLED;
+
+	if(cs_get_user_team(id) == CS_TEAM_T)
+	{
+		g_iWire = key;
+		client_print_color(id, id, "%s %l", g_szPrefix, "CHOSE_WIRE", ArrayGetStringHandle(g_arrayWires, key));
+		return PLUGIN_HANDLED;
+	}
+
+	//Sometimes g_eC4 is not valid ent, idk why this is happening
+	if(!is_valid_ent(g_eC4))
+		return PLUGIN_HANDLED;
+
+	if(g_iWire == key)
+	{
+		client_print_color(id, id, "%s %l", g_szPrefix, "CORRECT_WIRE", ArrayGetStringHandle(g_arrayWires, key));
+		set_ent_data_float(g_eC4, "CGrenade", "m_flDefuseCountDown", get_gametime());
+	}
+	else
+	{
+		client_print_color(id, id, "%s %l", g_szPrefix, "WRONG_WIRE", ArrayGetStringHandle(g_arrayWires, key), ArrayGetStringHandle(g_arrayWires, g_iWire));
+		set_ent_data_float(g_eC4, "CGrenade", "m_flC4Blow", get_gametime());
+	}
+
+	message_begin(MSG_ONE, g_iBarTimeMsg, _, id);
+	write_short(0);
+	message_end();
+
+	return PLUGIN_HANDLED;
+}
+
+public OnBombPlanted()
+{
+	//g_ePlayerResetMenu bartime event
+	HideMenu(g_ePlayerResetMenu);
+
+	g_eC4 = find_ent_by_model(-1, "grenade", "models/w_c4.mdl");
+
+	if(g_iWire == INVALID_WIRE)
+		g_iWire = random(g_iWires);
+}
+
+public OnBombDefused()
+{
+	//g_ePlayerResetMenu bartime event
+	HideMenu(g_ePlayerResetMenu);
+}
+
+public plugin_end()
+{
+	menu_destroy(g_hMenu);
+	ArrayDestroy(g_arrayWires);
+}
+
+ReadWiresFromFile()
 {
 	new szFileDir[PLATFORM_MAX_PATH], szLine[32];
 	get_localinfo("amxx_configsdir", szFileDir, charsmax(szFileDir));
-	format(szFileDir, charsmax(szFileDir), "%s/plugins/ctw/wires.ini", szFileDir);
+	add(szFileDir, charsmax(szFileDir), "/plugins/ctw/wires.ini");
 
 	new hFile = fopen(szFileDir, "rt", false);
 
@@ -106,104 +223,16 @@ public ReadWiresFromFile()
 	}
 	fclose(hFile);
 }
-		
-
-public BarTime_event(id)
-{
-	HideMenu(id);
-}
-
-public New_Round()
-{
-	g_eC4 = 0;
-	g_iWire = -1;
-}
-
-public PlayerKilledPost(victim, killer, gib)
-{
-	if(!g_eC4)
-		return;
-	
-	HideMenu(victim);
-}
 
 MakeMenu()
 {
 	new szItem[32];
-	g_hMenu = menu_create("Choose a wire", "chose_wire");
-	for(new i=0; i<g_iWires; i++)
+	g_hMenu = menu_create("Choose a wire", "MenuWiresHandler");
+	for(new i = 0; i < g_iWires; i++)
 	{
 		ArrayGetString(g_arrayWires, i, szItem, charsmax(szItem));
 		menu_additem(g_hMenu, szItem);
 	}
-}
-
-public bomb_planting(planter)
-{
-	g_iWire = -1;
-	SetupTitle(planter);
-	menu_display(planter, g_hMenu, 0, 3);
-}
-
-public bomb_planted(planter)
-{
-	HideMenu(planter);
-
-	g_eC4 = find_ent_by_model(-1, "grenade", "models/w_c4.mdl");
-	set_task(0.5, "CheckWire");
-}
-
-public CheckWire()
-{
-	if(g_iWire == -1)
-		g_iWire = random(g_iWires);
-}
-
-public bomb_defusing(defuser)
-{
-	SetupTitle(defuser);
-	menu_display(defuser, g_hMenu, 0, (cs_get_user_defuse(defuser)) ? 5 : 10);
-}
-
-public bomb_defused(defuser)
-{
-	HideMenu(defuser);
-}
-
-public chose_wire(id, menu, key)
-{
-	if(key == MENU_TIMEOUT || key < 0)
-		return PLUGIN_HANDLED;
-
-	if(!is_user_alive(id))
-		return PLUGIN_HANDLED;
-		
-	if(cs_get_user_team(id) == CS_TEAM_T)
-	{
-		g_iWire = key;
-		client_print_color(id, id, "%s %l", g_szPrefix, "CHOSE_WIRE", ArrayGetStringHandle(g_arrayWires, key));
-		return PLUGIN_HANDLED;
-	}
-
-	if(!is_valid_ent(g_eC4))
-		return PLUGIN_HANDLED;
-
-	if(g_iWire == key)
-	{
-		client_print_color(id, id, "%s %l", g_szPrefix, "CORRECT_WIRE", ArrayGetStringHandle(g_arrayWires, key));
-		set_ent_data_float(g_eC4, "CGrenade", "m_flDefuseCountDown", get_gametime());
-	}
-	else
-	{
-		client_print_color(id, id, "%s %l", g_szPrefix, "WRONG_WIRE", ArrayGetStringHandle(g_arrayWires, key), ArrayGetStringHandle(g_arrayWires, g_iWire));
-		set_ent_data_float(g_eC4, "CGrenade", "m_flC4Blow", get_gametime());
-	}
-
-	message_begin(MSG_ONE, g_iBarTime, _, id);
-	write_short(0);
-	message_end();
-
-	return PLUGIN_HANDLED;
 }
 
 HideMenu(id)
@@ -214,16 +243,10 @@ HideMenu(id)
 	static iMenu, iNewMenu;
 	player_menu_info(id, iMenu, iNewMenu);
 
-	if(iNewMenu != g_hMenu)
+	if((iMenu > 0 && iNewMenu < 0) || iNewMenu != g_hMenu)
 		return;
 
 	reset_menu(id);
-}
-
-public plugin_end()
-{
-	menu_destroy(g_hMenu);
-	ArrayDestroy(g_arrayWires);
 }
 
 SetupTitle(id)

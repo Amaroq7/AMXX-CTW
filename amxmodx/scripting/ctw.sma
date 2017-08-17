@@ -27,6 +27,7 @@
  * VEN - CS Bomb Script Tutorial
  *
  * Changelog:
+ * 1.0.1 - Fix displaying title for menu
  * 1.0.0 - ReAPI support
  * 0.0.3 - fixed some bugs
  * 0.0.2 - merged with amxx 1.8.3

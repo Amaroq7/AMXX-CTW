@@ -133,7 +133,8 @@ public OnBarTimeEvent(id)
 			g_ePlayerResetMenu = id;
 		}
 	}
-	SetupTitle(id);
+	SetGlobalTransTarget(id);
+	menu_setprop(g_hMenu, MPROP_TITLE, fmt("%l", "CHOOSE_WIRE"));
 	menu_display(id, g_hMenu, 0, iTime);
 }
 
@@ -282,10 +283,4 @@ HideMenu(id)
 		return;
 
 	reset_menu(id);
-}
-
-SetupTitle(id)
-{
-	SetGlobalTransTarget(id);
-	menu_setprop(g_hMenu, MPROP_TITLE, fmt("%l", "CHOOSE_WIRE"));
 }

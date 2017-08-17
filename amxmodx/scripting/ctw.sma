@@ -249,7 +249,6 @@ ReadWiresFromFile()
 	while (!feof(hFile))
 	{
 		fgets(hFile, szLine, charsmax(szLine));
-
 		trim(szLine);
 
 		if(!szLine[0] || szLine[0] == ';' || (szLine[0] == '/' && szLine[1] == '/'))
@@ -263,12 +262,10 @@ ReadWiresFromFile()
 
 MakeMenu()
 {
-	new szItem[32];
 	g_hMenu = menu_create("Choose a wire", "MenuWiresHandler");
 	for (new i = 0; i < g_iWires; i++)
 	{
-		ArrayGetString(g_arrayWires, i, szItem, charsmax(szItem));
-		menu_additem(g_hMenu, szItem);
+		menu_additem(g_hMenu, fmt("%a", ArrayGetStringHandle(g_arrayWires, i)));
 	}
 }
 
@@ -288,7 +285,6 @@ HideMenu(id)
 
 SetupTitle(id)
 {
-	static szTitle[32];
-	LookupLangKey(szTitle, charsmax(szTitle), "CHOOSE_WIRE", id);
-	menu_setprop(g_hMenu, MPROP_TITLE, szTitle);
+	SetGlobalTransTarget(id);
+	menu_setprop(g_hMenu, MPROP_TITLE, fmt("%l", "CHOOSE_WIRE"));
 }

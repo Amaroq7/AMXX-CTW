@@ -105,7 +105,7 @@ public plugin_cfg()
 	MakeMenu();
 }
 
-public client_disconnected(id, bool:drop, message[], maxlen)
+public client_remove(id, bool:drop, const message[])
 {
 	if (g_ePlayerResetMenu == id)
 		g_ePlayerResetMenu = 0;

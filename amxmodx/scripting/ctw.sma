@@ -10,7 +10,7 @@
 
 /*
  * Description:
- * As CT allows to cut a wire that has been chosen by planter (TT). If CT chose right the C4 won't explode in other case C4 will explode.
+ * As CT allows to cut a wire that has been chosen by planter (TT). If CT choose right the C4 won't explode in other case C4 will explode.
  *
  * Requirement(s):
  * AMX Mod X 1.8.3
@@ -63,9 +63,9 @@ new g_ePlayerResetMenu;
 public plugin_init()
 {
 	register_plugin("Cut the wire", "0.0.4-dev", "Ni3znajomy");
-	
+
 	create_cvar("ctw_version", "0.0.4-dev", FCVAR_SERVER, "CTW version");
-	
+
 	g_iBarTimeMsg = get_user_msgid("BarTime");
 
 	register_event("BarTime", "OnBarTimeEvent", "bef", "1=0", "1=3", "1=5", "1=10");
@@ -90,7 +90,7 @@ public plugin_cfg()
 
 public client_disconnected(id, bool:drop, message[], maxlen)
 {
-	if(g_ePlayerResetMenu == id)
+	if (g_ePlayerResetMenu == id)
 		g_ePlayerResetMenu = 0;
 }
 
@@ -98,7 +98,7 @@ public OnBarTimeEvent(id)
 {
 	new iTime = read_data(1);
 
-	switch(iTime)
+	switch (iTime)
 	{
 		case BARTIME_NONE:
 		{
@@ -127,7 +127,7 @@ public OnNewRoundStart()
 
 public CBasePlayerKilledPost(this, killer, gib)
 {
-	if(g_ePlayerResetMenu == this)
+	if (g_ePlayerResetMenu == this)
 	{
 		HideMenu(this);
 	}
@@ -135,10 +135,10 @@ public CBasePlayerKilledPost(this, killer, gib)
 
 public MenuWiresHandler(id, menu, key)
 {
-	if(key == MENU_TIMEOUT || key == MENU_EXIT)
+	if (key == MENU_TIMEOUT || key == MENU_EXIT)
 		return PLUGIN_HANDLED;
 
-	if(cs_get_user_team(id) == CS_TEAM_T)
+	if (cs_get_user_team(id) == CS_TEAM_T)
 	{
 		g_iWire = key;
 		client_print_color(id, id, "%s %l", g_szPrefix, "CHOSE_WIRE", ArrayGetStringHandle(g_arrayWires, key));
@@ -146,10 +146,10 @@ public MenuWiresHandler(id, menu, key)
 	}
 
 	//Sometimes g_eC4 is not valid ent, idk why this is happening
-	if(!is_valid_ent(g_eC4))
+	if (!is_valid_ent(g_eC4))
 		return PLUGIN_HANDLED;
 
-	if(g_iWire == key)
+	if (g_iWire == key)
 	{
 		client_print_color(id, id, "%s %l", g_szPrefix, "CORRECT_WIRE", ArrayGetStringHandle(g_arrayWires, key));
 		set_ent_data_float(g_eC4, "CGrenade", "m_flDefuseCountDown", get_gametime());
@@ -174,7 +174,7 @@ public OnBombPlanted()
 
 	g_eC4 = find_ent_by_model(-1, "grenade", "models/w_c4.mdl");
 
-	if(g_iWire == INVALID_WIRE)
+	if (g_iWire == INVALID_WIRE)
 		g_iWire = random(g_iWires);
 }
 
@@ -198,13 +198,13 @@ ReadWiresFromFile()
 
 	new hFile = fopen(szFileDir, "rt", false);
 
-	if(!hFile)
+	if (!hFile)
 	{
 		set_fail_state("%l", "CANNOT_READ_FILE", szFileDir);
 		return;
 	}
 
-	while(!feof(hFile))
+	while (!feof(hFile))
 	{
 		fgets(hFile, szLine, charsmax(szLine));
 
@@ -223,7 +223,7 @@ MakeMenu()
 {
 	new szItem[32];
 	g_hMenu = menu_create("Choose a wire", "MenuWiresHandler");
-	for(new i = 0; i < g_iWires; i++)
+	for (new i = 0; i < g_iWires; i++)
 	{
 		ArrayGetString(g_arrayWires, i, szItem, charsmax(szItem));
 		menu_additem(g_hMenu, szItem);
@@ -232,13 +232,13 @@ MakeMenu()
 
 HideMenu(id)
 {
-	if(!is_user_connected(id))
+	if (!is_user_connected(id))
 		return;
 
 	static iMenu, iNewMenu;
 	player_menu_info(id, iMenu, iNewMenu);
 
-	if((iMenu > 0 && iNewMenu < 0) || iNewMenu != g_hMenu)
+	if ((iMenu > 0 && iNewMenu < 0) || iNewMenu != g_hMenu)
 		return;
 
 	reset_menu(id);

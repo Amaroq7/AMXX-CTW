@@ -3,7 +3,7 @@
  *
  * Cut the wire, v0.0.4-dev
  *
- * (c) Copyright 2014-2016 - Ni3znajomy
+ * (c) Copyright 2014-2017 - Amaroq
  * This file is provided as is (no warranties).
  *
  */
@@ -62,7 +62,7 @@ new g_ePlayerResetMenu;
 
 public plugin_init()
 {
-	register_plugin("Cut the wire", "0.0.4-dev", "Ni3znajomy");
+	register_plugin("Cut the wire", "0.0.4-dev", "Amaroq");
 
 	create_cvar("ctw_version", "0.0.4-dev", FCVAR_SERVER, "CTW version");
 

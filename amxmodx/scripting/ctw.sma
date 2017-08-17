@@ -1,7 +1,7 @@
 /*
  * AMX Mod X plugin
  *
- * Cut the wire, v0.0.4-dev
+ * Cut the wire, v1.0.0
  *
  * (c) Copyright 2014-2017 - Amaroq
  * This file is provided as is (no warranties).
@@ -27,6 +27,7 @@
  * VEN - CS Bomb Script Tutorial
  *
  * Changelog:
+ * 1.0.0 - ReAPI support
  * 0.0.3 - fixed some bugs
  * 0.0.2 - merged with amxx 1.8.3
  * 0.0.1 - initial release
@@ -73,9 +74,9 @@ new g_ePlayerResetMenu;
 
 public plugin_init()
 {
-	register_plugin("Cut the wire", "0.0.4-dev", "Amaroq");
+	register_plugin("Cut the wire", "1.0.0", "Amaroq");
 
-	create_cvar("ctw_version", "0.0.4-dev", FCVAR_SERVER, "CTW version");
+	create_cvar("ctw_version", "1.0.0", FCVAR_SERVER, "CTW version");
 
 	#if !defined REAPI_SUPPORT
 	g_iBarTimeMsg = get_user_msgid("BarTime");

@@ -89,7 +89,7 @@ public plugin_init()
 	register_logevent("OnBombDefused", 3, "2=Defused_The_Bomb");
 
 	#if defined REAPI_SUPPORT
-	RegisterHookChain(RG_CBasePlayer_Spawn, "CBasePlayerSpawnPost", 1);
+	RegisterHookChain(RG_CBasePlayer_Killed, "CBasePlayerKilledPost", 1);
 	#else
 	RegisterHamPlayer(Ham_Killed, "CBasePlayerKilledPost", 1);
 	#endif

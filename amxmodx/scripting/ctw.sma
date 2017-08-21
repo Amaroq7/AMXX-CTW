@@ -210,7 +210,7 @@ public OnBombPlanted()
 	while ((iIndex = rg_find_ent_by_class(iIndex, "grenade", true)))
 	{
 		get_entvar(iIndex, var_model, szModel, charsmax(szModel));
-		if (!equal(szModel, "models/w_c4.mdl"))
+		if (equal(szModel, "models/w_c4.mdl"))
 		{
 			g_eC4 = iIndex;
 			break;
